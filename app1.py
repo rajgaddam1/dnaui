@@ -43,16 +43,17 @@ def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
     sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
-    try:
-        cur = con.cursor()
-        cur.execute(sql_cmd)
-        st.write('Warehouse has been created')
-    except Exception as e:
-        print(e)
-        st.write('An error has occured please check logs')
-    finally:
-        cur.close()
-    con.close()
+    if st.button('Create Warehouse'):
+        try:
+            cur = con.cursor()
+            cur.execute(sql_cmd)
+            st.write('Warehouse has been created')
+        except Exception as e:
+            print(e)
+            st.write('An error has occured please check logs')
+        finally:
+            cur.close()
+        con.close()
         
     
 ################
