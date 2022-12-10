@@ -30,5 +30,5 @@ databases = get_databases(snowflake_connector)
 with st.sidebar:
     add_radio = st.radio(
         "Databases",
-        databases.names
+        databases.name
     )
