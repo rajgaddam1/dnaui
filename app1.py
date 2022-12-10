@@ -27,4 +27,8 @@ def get_databases(_connector) -> pd.DataFrame:
 
 databases = get_databases(snowflake_connector)
 
-st.sidebar.["element_name"]
+with st.sidebar:
+    add_radio = st.radio(
+        "Databases",
+        databases.names
+    )
