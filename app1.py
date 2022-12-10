@@ -27,5 +27,4 @@ def get_databases(_connector) -> pd.DataFrame:
 
 databases = get_databases(snowflake_connector)
 
-with st.sidebar:
-    st.[databases.name]
+st.sidebar.["element_name"]
