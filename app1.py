@@ -74,7 +74,7 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse', on_click = callback ,type = "primary") or st.session_state.key:
+    if st.button('Create a new warehouse', on_click = callback) or st.session_state.key:
         
         create_ware(con)
         #pass
