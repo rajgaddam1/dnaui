@@ -32,13 +32,22 @@ list_ware = wareshouse['name'].to_list()
 list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
 #################
-def create_ware():
+def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
+    sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
+    try:
+        cur = con.cursor()
+        cur.execute(sql_cmd)
+        st.write('Warehouse has been created')
+    except Exception as e:
+        print(e)
+        st.write('An error has occured please check logs')
+    finally:
+        cur.close()
+    con.close()
+        
     
-
-
-
 ################
 with st.sidebar:
     sel_ware = st.radio(
@@ -48,7 +57,7 @@ with st.sidebar:
 
 if sel_ware != 'Select below available wareshouse':
     if st.button('Create a new warehouse'):
-        create_ware()
+        create_ware(snowflake_connector)
         pass
     st.subheader('Warehouse Information')
 
