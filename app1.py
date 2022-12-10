@@ -31,7 +31,15 @@ wareshouse = get_wareshouse(snowflake_connector)
 list_ware = wareshouse['name'].to_list()
 list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
+#################
+def create_ware():
+    ware_name = st.text_input('Enter Warehouse Name')
+    ware_size = st.slider('Select size', 'XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE')
+    
 
+
+
+################
 with st.sidebar:
     sel_ware = st.radio(
         "Warehouse",
@@ -40,6 +48,7 @@ with st.sidebar:
 
 if sel_ware != 'Select below available wareshouse':
     if st.button('Create a new warehouse'):
+        create_ware()
         pass
     st.subheader('Warehouse Information')
 
