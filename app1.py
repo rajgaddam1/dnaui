@@ -47,7 +47,7 @@ databases = get_databases(snowflake_connector)
 
 list_data = databases['name'].to_list()
 list_up = ['Select below available Databases']
-list_data_up = list_data + list_up
+list_data_up = list_up + list_data
 
 with st.sidebar:
     add_radio = st.radio(
