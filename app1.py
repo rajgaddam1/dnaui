@@ -45,8 +45,12 @@ def get_databases(_connector) -> pd.DataFrame:
 
 databases = get_databases(snowflake_connector)
 
+list_data = databases['name'].to_list()
+list_up = ['Select below available Databases']
+list_data_up = list_data + list_ware
+
 with st.sidebar:
     add_radio = st.radio(
         "Databases",
-        databases.name
+        list_data_up
     )
