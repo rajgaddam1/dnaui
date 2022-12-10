@@ -11,6 +11,7 @@ user = os.environ.get('user')
 password = os.environ.get('password')
 account = os.environ.get('account')
 
+####Snowflake connection
 def get_connector() -> SnowflakeConnection:
     """Create a connector to SnowFlake using credentials filled in Streamlit secrets"""
     con = snowflake.connector.connect(
@@ -21,7 +22,20 @@ def get_connector() -> SnowflakeConnection:
     return con
 
 snowflake_connector = get_connector()
+#####Show warehouses
+def get_wareshouse(_connector) -> pd.DataFrame:
+    return pd.read_sql("SHOW WAREHOUSES;", _connector)
 
+wareshouse = get_wareshouse(snowflake_connector)
+
+with st.sidebar:
+    add_radio = st.radio(
+        "Warehouse",
+        wareshouse.name
+    )
+
+
+####ShowDatabases
 def get_databases(_connector) -> pd.DataFrame:
     return pd.read_sql("SHOW DATABASES;", _connector)
 
