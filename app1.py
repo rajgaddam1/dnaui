@@ -34,7 +34,7 @@ list_ware_up = list_up + list_ware
 #################
 def create_ware():
     ware_name = st.text_input('Enter Warehouse Name')
-    ware_size = st.select_slider('Select size', 'XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE')
+    ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
     
 
 
