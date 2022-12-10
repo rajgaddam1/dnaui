@@ -64,7 +64,7 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse'):
+    if st.button('Create a new warehouse',type="primary"):
         create_ware(con)
         pass
     st.subheader('Warehouse Information')
