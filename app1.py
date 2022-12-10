@@ -33,10 +33,14 @@ list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
 
 with st.sidebar:
-    add_radio = st.radio(
+    sel_ware = st.radio(
         "Warehouse",
         list_ware_up
     )
+
+if sel_ware != 'Select below available wareshouse':
+    if st.button('Create a new warehouse'):
+        pass
 
 
 ####ShowDatabases
