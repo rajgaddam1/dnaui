@@ -43,7 +43,7 @@ def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
     sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
-    if st.button('Create Warehouse', type="primary"):
+    if st.button('Create Warehouse', key = 2, type="primary"):
         try:
             cur = con.cursor()
             cur.execute(sql_cmd)
@@ -64,7 +64,7 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse',type="primary"):
+    if st.button('Create a new warehouse', key = 1, type="primary"):
         create_ware(con)
         pass
     st.subheader('Warehouse Information')
