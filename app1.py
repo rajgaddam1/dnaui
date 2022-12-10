@@ -41,6 +41,7 @@ with st.sidebar:
 if sel_ware != 'Select below available wareshouse':
     if st.button('Create a new warehouse'):
         pass
+    st.dataframe(wareshouse)
 
 
 ####ShowDatabases
