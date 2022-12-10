@@ -11,6 +11,13 @@ user = os.environ.get('user')
 password = os.environ.get('password')
 account = os.environ.get('account')
 
+###Snow connection
+
+con = snowflake.connector.connect(
+                    user = user,
+                    password = password,
+                    account='MD93775.ap-southeast-1')
+
 ####Snowflake connection
 def get_connector() -> SnowflakeConnection:
     """Create a connector to SnowFlake using credentials filled in Streamlit secrets"""
@@ -57,7 +64,7 @@ with st.sidebar:
 
 if sel_ware != 'Select below available wareshouse':
     if st.button('Create a new warehouse'):
-        create_ware(snowflake_connector)
+        create_ware(con)
         pass
     st.subheader('Warehouse Information')
 
