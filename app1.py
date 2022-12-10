@@ -70,7 +70,8 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse',type = 'primary') or st.session_state.key:
+    if st.button('Create a new warehouse',type = 'primary') or st.session_state:
+        
         st.session_state.key =True
 
         create_ware(con)
