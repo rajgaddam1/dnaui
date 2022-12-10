@@ -1,4 +1,2 @@
 -r https://raw.githubusercontent.com/snowflakedb/snowflake-connector-python/v2.7.9/tested_requirements/requirements_38.reqs
-pipenv shell
-pip install --upgrade streamlit
-streamlit version
+streamlit==1.4.0
