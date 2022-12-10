@@ -31,7 +31,7 @@ wareshouse = get_wareshouse(snowflake_connector)
 with st.sidebar:
     add_radio = st.radio(
         "Warehouse",
-        ("Select below available warehouse",wareshouse.name)
+        ("Select below available warehouse", wareshouse.name)
     )
 
 
