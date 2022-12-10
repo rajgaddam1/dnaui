@@ -42,7 +42,7 @@ if sel_ware != 'Select below available wareshouse':
     if st.button('Create a new warehouse'):
         pass
     st.header('Warehouse Information')
-    st.dataframe(wareshouse[['name', 'size']])
+    st.dataframe(wareshouse[['name', 'size']]['name'] == sel_ware )
 
 
 ####ShowDatabases
