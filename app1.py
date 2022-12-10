@@ -6,9 +6,13 @@ import pandas as pd
 from snowflake.connector.connection import SnowflakeConnection
 
 
-##To manage bug in sreamlit
+##To manage bug in sreamlit(Intialize button click)
 if 'key' not in st.session_state:
     st.session_state.key = False
+
+def callback():
+    st.session_state.key = True
+    
 
 warnings.filterwarnings("ignore")
 
@@ -70,12 +74,10 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse',type = 'primary') or st.session_state:
+    if st.button('Create a new warehouse', on_click = callback ,type = 'primary') or st.session_state.key:
         
-        st.session_state.key =True
-
         create_ware(con)
-        pass
+        #pass
     st.subheader('Warehouse Information')
 
     st.dataframe(wareshouse[['name', 'size']].loc[wareshouse['name'] == sel_ware])
