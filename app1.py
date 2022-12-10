@@ -28,12 +28,14 @@ def get_wareshouse(_connector) -> pd.DataFrame:
 
 wareshouse = get_wareshouse(snowflake_connector)
 
-wareshouse = wareshouse.append({'name': 'Select Warehouse'}, ignore_index=True)
+list_ware = wareshouse['name'].to_list()
+list_up = ['Select below available wareshouse']
+list_ware_up = list_up + list_ware
 
 with st.sidebar:
     add_radio = st.radio(
         "Warehouse",
-        wareshouse.name
+        list_ware_up
     )
 
 
