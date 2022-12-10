@@ -28,7 +28,7 @@ def get_wareshouse(_connector) -> pd.DataFrame:
 
 wareshouse = get_wareshouse(snowflake_connector)
 
-wareshouse.append({'name': 'Select Warehouse'}, ignore_index=True)
+wareshouse = wareshouse.append({'name': 'Select Warehouse'}, ignore_index=True)
 
 with st.sidebar:
     add_radio = st.radio(
