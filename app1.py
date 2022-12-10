@@ -1,57 +1,31 @@
-# -*- coding: utf-8 -*-
 import streamlit as st
 import os
 import snowflake.connector
-import warnings 
+import warnings
+import pandas as pd
+from snowflake.connector.connection import SnowflakeConnection
+
 warnings.filterwarnings("ignore")
-
-st.title("DNA Hackathon", anchor=None)
-
-selected_database = st.selectbox("Select the Databse Name", ("None","student", "employee"))
-st.write(selected_database)
-
-selected_schema = st.selectbox("Select the Schema Name", ("None","info", "contact"))
-st.write(selected_schema)
-
-first_name = st.text_input('Enter your First Name')
-st.write(first_name)
-
-last_name = st.text_input('Enter your Last Name')
-st.write(last_name)
-
-email_id = st.text_input('Enter your Email')
-st.write(email_id)
-
-contact_no = st.text_input('Enter your Contact Number')
-st.write(contact_no)
-
-address = st.text_input('Enter your Address')
-st.write(address)
 
 user = os.environ.get('user')
 password = os.environ.get('password')
-insert_query = """
+account = os.environ.get('account')
 
-    INSERT INTO INFO.DETAILS (FIRST_NAME,LAST_NAME,EMAIL_ID,CONTACT_NO,ADDRESS) 
-       VALUES(%s,%s,%s,%s,%s);
-"""
-
-if st.button("submit"):
-    with snowflake.connector.connect(
+def get_connector() -> SnowflakeConnection:
+    """Create a connector to SnowFlake using credentials filled in Streamlit secrets"""
+    con = snowflake.connector.connect(
     user = user,
     password = password,
-    account = 'VK83964.ap-southeast-1',
-    warehouse = 'DNAHACK',
-    database = 'DNAHACK',
-    schema = 'INFO'
-    ) as con:
-        
-        try:
-            cur = con.cursor()
-            cur.execute(insert_query,(first_name,last_name,email_id,contact_no,address))
-        except Exception as e:
-            print(e)
-        finally:
-            cur.close()
-    con.close()
-    st.write('Added to the database')
+    account = account,
+    warehouse='DNAHACK')
+    return con
+
+snowflake_connector = get_connector()
+
+def get_databases(_connector) -> pd.DataFrame:
+    return pd.read_sql("SHOW DATABASES;", _connector)
+
+databases = get_databases(snowflake_connector)
+
+with st.sidebar:
+    st.[databases.name]
