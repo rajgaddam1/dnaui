@@ -4,6 +4,10 @@ import snowflake.connector
 import warnings
 import pandas as pd
 from snowflake.connector.connection import SnowflakeConnection
+import SessionState
+
+##To manage bug in sreamlit
+session_state = SessionState.get(checkboxed=False)
 
 warnings.filterwarnings("ignore")
 
@@ -39,7 +43,7 @@ list_ware = wareshouse['name'].to_list()
 list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
 #################
-@st.cache
+
 def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
@@ -65,7 +69,8 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse'):
+    if st.button('Create a new warehouse',type = 'primary') or session_state.checkboxed:
+        session_state.checkboxed = True
         create_ware(con)
         pass
     st.subheader('Warehouse Information')
