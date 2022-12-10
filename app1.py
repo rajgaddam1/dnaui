@@ -39,6 +39,7 @@ list_ware = wareshouse['name'].to_list()
 list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
 #################
+@st.cache
 def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
@@ -64,7 +65,7 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse',on_click=create_ware(con)):
+    if st.button('Create a new warehouse'):
         create_ware(con)
         pass
     st.subheader('Warehouse Information')
