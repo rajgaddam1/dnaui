@@ -4,10 +4,11 @@ import snowflake.connector
 import warnings
 import pandas as pd
 from snowflake.connector.connection import SnowflakeConnection
-import SessionState
+
 
 ##To manage bug in sreamlit
-session_state = SessionState.get(checkboxed=False)
+if 'key' not in st.session_state:
+    st.session_state.key = False
 
 warnings.filterwarnings("ignore")
 
@@ -69,8 +70,9 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse',type = 'primary') or session_state.checkboxed:
-        session_state.checkboxed = True
+    if st.button('Create a new warehouse',type = 'primary') or st.session_state.key:
+        st.session_state.key =True
+
         create_ware(con)
         pass
     st.subheader('Warehouse Information')
