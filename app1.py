@@ -64,9 +64,9 @@ with st.sidebar:
     )
 
 if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse', key = 1, type="primary"):
-        create_ware(con)
-        #pass
+    if st.button('Create a new warehouse', on_click = create_ware(con) , type="primary"):
+        #create_ware(con)
+        pass
     st.subheader('Warehouse Information')
 
     st.dataframe(wareshouse[['name', 'size']].loc[wareshouse['name'] == sel_ware])
