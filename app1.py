@@ -133,7 +133,9 @@ databases = get_databases(snowflake_connector)
 database_csv = convert_df(databases)
 
 ##Adding Database type by creating copy of dataframe
-
+databases_up = databases.copy()
+databases_up.rename(columns={'options': 'type'}, inplace=True)
+databases_up['type'] = databases_up['type'].replace(np.nan, 'PERMANENT')
 #databases_up.type.fillna("PERMANENT",inplace = True)
 
 
@@ -153,9 +155,6 @@ if sel_data != 'Select below available Databases':
         create_data(con)
         #pass
     st.subheader('Database Information')
-    databases_up = databases.copy()
-    databases_up.rename(columns={'options': 'type'}, inplace=True)
-    databases_up['type'] = databases_up['type'].fillna('PERMANENT')
 
     st.dataframe(databases_up[['name', 'type']].loc[databases_up['name'] == sel_data])
     
