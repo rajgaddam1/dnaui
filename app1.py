@@ -25,43 +25,8 @@ def convert_df(df):
 user = os.environ.get('user')
 password = os.environ.get('password')
 account = os.environ.get('account')
-#################
 
-def style_button_row(clicked_button_ix, n_buttons):
-    def get_button_indices(button_ix):
-        return {
-            'nth_child': button_ix,
-            'nth_last_child': n_buttons - button_ix + 1
-        }
-
-    clicked_style = """
-    div[data-testid*="stHorizontalBlock"] > div:nth-child(%(nth_child)s):nth-last-child(%(nth_last_child)s) button {
-        border-color: rgb(255, 75, 75);
-        color: rgb(255, 75, 75);
-        box-shadow: rgba(255, 75, 75, 0.5) 0px 0px 0px 0.2rem;
-        outline: currentcolor none medium;
-    }
-    """
-    unclicked_style = """
-    div[data-testid*="stHorizontalBlock"] > div:nth-child(%(nth_child)s):nth-last-child(%(nth_last_child)s) button {
-        pointer-events: none;
-        cursor: not-allowed;
-        opacity: 0.65;
-        filter: alpha(opacity=65);
-        -webkit-box-shadow: none;
-        box-shadow: none;
-    }
-    """
-    style = ""
-    for ix in range(n_buttons):
-        ix += 1
-        if ix == clicked_button_ix:
-            style += clicked_style % get_button_indices(ix)
-        else:
-            style += unclicked_style % get_button_indices(ix)
-    st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
-
-###Snow connection#######
+###Snow connection
 
 con = snowflake.connector.connect(
                     user = user,
@@ -92,15 +57,14 @@ list_ware_up = list_up + list_ware
 ##Snowflake Waarehouse dataframe to csv
 
 ware_csv = convert_df(wareshouse)
-#################
+
+#################Function to create Warehouse
 
 def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
     sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
-    if st.button('Create Warehouse', on_click=style_button_row, kwargs={
-        'clicked_button_ix': 1, 'n_buttons': 4}):
-        
+    if st.button('Create Warehouse'):
         try:
             cur = con.cursor()
             cur.execute(sql_cmd)
@@ -111,9 +75,29 @@ def create_ware(con):
         finally:
             cur.close()
         con.close()
+#################Function to create Databsase
+def create_data(con):
+    database_name = st.text_input('Enter Database Name')
+    database_type = st.radio('Select Database Type', ['PERMANENT', 'TRANSIENT'])
+    if database_type == 'PERMANENT':
+        sql_cmd = 'CREATE OR REPLACE DATABASE  ' + str(database_name) + ';'
+    else:
+        sql_cmd = 'CREATE OR REPLACE TRANSIENT DATABASE  ' + str(database_name) + ';'
+        
+    if st.button('Create Database'):
+        try:
+            cur = con.cursor()
+            cur.execute(sql_cmd)
+            st.write('Database has been created')
+        except Exception as e:
+            print(e)
+            st.write('An error has occured please check logs')
+        finally:
+            cur.close()
+        con.close()
         
     
-################
+################SIDEBAR_1(WAREHOUSE)
 with st.sidebar:
     sel_ware = st.radio(
         "Warehouse",
@@ -144,12 +128,37 @@ def get_databases(_connector) -> pd.DataFrame:
 
 databases = get_databases(snowflake_connector)
 
+##Snowflake Waarehouse dataframe to csv
+
+database_csv = convert_df(databases)
+
+##Adding Database type
+databases_up = databases.options.fillna("permanent")
+databases_up.rename(columns={'options': 'database_type'}, inplace=True)
+
 list_data = databases['name'].to_list()
 list_up = ['Select below available Databases']
 list_data_up = list_up + list_data
-
+#############SIDEBAR_2(DATABASES)
 with st.sidebar:
-    add_radio = st.radio(
+    sel_data = st.radio(
         "Databases",
         list_data_up
     )
+    
+if sel_data != 'Select below available Databases':
+    if st.button('Create Database', on_click = callback) or st.session_state.key:
+        
+        create_data(con)
+        #pass
+    st.subheader('Database Information')
+
+    st.dataframe(databases_up[['name', 'database_type']].loc[databases_up['name'] == sel_data])
+    
+    st.markdown("Click on below button to Download full Information about Database")
+    st.download_button(
+    label = "Download data as CSV",
+    data = database_csv,
+    file_name = 'Database_info.csv',
+    mime = 'text/csv',
+)
