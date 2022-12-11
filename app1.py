@@ -153,7 +153,7 @@ if sel_data != 'Select below available Databases':
         #pass
     st.subheader('Database Information')
 
-    st.dataframe(databases_up[['name', 'database_type']].loc[databases_up['name'] == sel_data])
+    st.dataframe(databases_up[['name', 'options']].loc[databases_up['name'] == sel_data])
     
     st.markdown("Click on below button to Download full Information about Database")
     st.download_button(
