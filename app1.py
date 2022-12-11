@@ -144,10 +144,8 @@ list_up = ['Select below available Databases']
 list_data_up = list_up + list_data
 #############SIDEBAR_2(DATABASES)
 with st.sidebar:
-    sel_data = st.radio(
-        "Databases",
-        list_data_up
-    )
+    global sel_data
+    sel_data = st.radio("Databases", list_data_up)
     
 if sel_data != 'Select below available Databases':
     if st.button('Create a Database', on_click = callback) or st.session_state.key:
@@ -165,3 +163,16 @@ if sel_data != 'Select below available Databases':
     file_name = 'Database_info.csv',
     mime = 'text/csv',
 )
+    
+#############SIDEBAR_3(Schemas)  
+def get_schema(_connector, dbname) -> pd.DataFrame:
+    sql_cmd2 = 'SHOW SCHEMAS IN DATABASE ' + str(dbname) + ';'
+    return pd.read_sql(sql_cmd2, _connector)
+ 
+if sel_data != 'Select below available Databases':
+    schemas_df = get_schema(snowflake_connector, sel_data)
+    sc_list_data = schemas_df['name'].to_list()
+    sc_list_up = ['Select below available Schemas']
+    sc_list_data_up = sc_list_up + sc_list_data
+    with st.sidebar:
+        sel_schema = st.radio("Schema",sc_list_data_up)
