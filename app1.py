@@ -25,8 +25,43 @@ def convert_df(df):
 user = os.environ.get('user')
 password = os.environ.get('password')
 account = os.environ.get('account')
+#################
 
-###Snow connection
+def style_button_row(clicked_button_ix, n_buttons):
+    def get_button_indices(button_ix):
+        return {
+            'nth_child': button_ix,
+            'nth_last_child': n_buttons - button_ix + 1
+        }
+
+    clicked_style = """
+    div[data-testid*="stHorizontalBlock"] > div:nth-child(%(nth_child)s):nth-last-child(%(nth_last_child)s) button {
+        border-color: rgb(255, 75, 75);
+        color: rgb(255, 75, 75);
+        box-shadow: rgba(255, 75, 75, 0.5) 0px 0px 0px 0.2rem;
+        outline: currentcolor none medium;
+    }
+    """
+    unclicked_style = """
+    div[data-testid*="stHorizontalBlock"] > div:nth-child(%(nth_child)s):nth-last-child(%(nth_last_child)s) button {
+        pointer-events: none;
+        cursor: not-allowed;
+        opacity: 0.65;
+        filter: alpha(opacity=65);
+        -webkit-box-shadow: none;
+        box-shadow: none;
+    }
+    """
+    style = ""
+    for ix in range(n_buttons):
+        ix += 1
+        if ix == clicked_button_ix:
+            style += clicked_style % get_button_indices(ix)
+        else:
+            style += unclicked_style % get_button_indices(ix)
+    st.markdown(f"<style>{style}</style>", unsafe_allow_html=True)
+
+###Snow connection#######
 
 con = snowflake.connector.connect(
                     user = user,
@@ -63,7 +98,9 @@ def create_ware(con):
     ware_name = st.text_input('Enter Warehouse Name')
     ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
     sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
-    if st.button('Create Warehouse'):
+    if st.button('Create Warehouse', on_click=style_button_row, kwargs={
+        'clicked_button_ix': 1, 'n_buttons': 4}):
+        
         try:
             cur = con.cursor()
             cur.execute(sql_cmd)
