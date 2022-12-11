@@ -148,7 +148,7 @@ with st.sidebar:
     sel_data = st.radio("Databases", list_data_up)
 with st.sidebar:
     global sel_schema1
-    sel_schema1 = st.radio("Schema",None)
+    sel_schema1 = st.radio("Schema", 'None')
     
 if sel_data != 'Select below available Databases':
     if st.button('Create a Database', on_click = callback) or st.session_state.key:
