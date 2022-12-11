@@ -134,7 +134,7 @@ database_csv = convert_df(databases)
 
 ##Adding Database type
 databases_up = databases.options.fillna("permanent")
-databases_up.rename(columns={'options': 'database_type'}, inplace=True)
+databases_up = databases_up.rename(columns={'options': 'database_type'})
 
 list_data = databases['name'].to_list()
 list_up = ['Select below available Databases']
