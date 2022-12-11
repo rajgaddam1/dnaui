@@ -132,9 +132,10 @@ databases = get_databases(snowflake_connector)
 
 database_csv = convert_df(databases)
 
-##Adding Database type
-databases_up = databases.options.fillna("permanent")
-#databases_up = databases_up.rename(columns={'options': 'database_type'})
+##Adding Database type by creating copy of dataframe
+databases_up = databases.copy()
+databases_up = databases_up.options.fillna("permanent")
+databases_up.rename(columns={'options': 'database_type'}, inplace=True)
 
 list_data = databases['name'].to_list()
 list_up = ['Select below available Databases']
@@ -153,7 +154,7 @@ if sel_data != 'Select below available Databases':
         #pass
     st.subheader('Database Information')
 
-    st.dataframe(databases_up[['name', 'options']].loc[databases_up['name'] == sel_data])
+    st.dataframe(databases_up[['name', 'database_type']].loc[databases_up['name'] == sel_data])
     
     st.markdown("Click on below button to Download full Information about Database")
     st.download_button(
