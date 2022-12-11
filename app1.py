@@ -170,6 +170,7 @@ def get_schema(_connector, dbname) -> pd.DataFrame:
     return pd.read_sql(sql_cmd2, _connector)
  
 if sel_data != 'Select below available Databases':
+    global sel_schema
     schemas_df = get_schema(snowflake_connector, sel_data)
     sc_list_data = schemas_df['name'].to_list()
     sc_list_up = ['Select below available Schemas']
