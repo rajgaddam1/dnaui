@@ -147,6 +147,7 @@ with st.sidebar:
     global sel_data
     sel_data = st.radio("Databases", list_data_up)
 with st.sidebar:
+    global sel_schema
     sel_schema = st.radio("Schema",None)
     
 if sel_data != 'Select below available Databases':
@@ -172,7 +173,7 @@ def get_schema(_connector, dbname) -> pd.DataFrame:
     return pd.read_sql(sql_cmd2, _connector)
  
 if sel_data != 'Select below available Databases':
-    global sel_schema
+    
     schemas_df = get_schema(snowflake_connector, sel_data)
     sc_list_data = schemas_df['name'].to_list()
     sc_list_up = ['Select below available Schemas']
