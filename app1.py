@@ -135,8 +135,8 @@ database_csv = convert_df(databases)
 ##Adding Database type by creating copy of dataframe
 databases_up = databases.copy()
 databases_up.rename(columns={'options': 'type'}, inplace=True)
-databases_up = databases_up.replace(np.nan, 'PERMANENT')
-#databases_up.type.fillna("PERMANENT",inplace = True)
+#databases_up['type'] = databases_up['type'].replace(np.nan, 'PERMANENT')
+databases_up.type.fillna("PERMANENT",inplace = True)
 
 
 list_data = databases['name'].to_list()
