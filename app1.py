@@ -2,6 +2,7 @@ import streamlit as st
 import os
 import snowflake.connector
 import warnings
+warnings.filterwarnings("ignore")
 import pandas as pd
 from snowflake.connector.connection import SnowflakeConnection
 
@@ -13,9 +14,14 @@ if 'key' not in st.session_state:
 def callback():
     st.session_state.key = True
     
+###Function to convert data to csv
 
-warnings.filterwarnings("ignore")
+@st.cache
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv().encode('utf-8')
 
+##############Snowflake Credentials
 user = os.environ.get('user')
 password = os.environ.get('password')
 account = os.environ.get('account')
@@ -47,6 +53,10 @@ wareshouse = get_wareshouse(snowflake_connector)
 list_ware = wareshouse['name'].to_list()
 list_up = ['Select below available wareshouse']
 list_ware_up = list_up + list_ware
+
+##Snowflake Waarehouse dataframe to csv
+
+ware_csv = convert_df(wareshouse)
 #################
 
 def create_ware(con):
@@ -81,6 +91,14 @@ if sel_ware != 'Select below available wareshouse':
     st.subheader('Warehouse Information')
 
     st.dataframe(wareshouse[['name', 'size']].loc[wareshouse['name'] == sel_ware])
+    
+    st.markdown("Click on below button to Download full Information about Warehouse")
+    st.download_button(
+    label = "Download data as CSV",
+    data = ware_csv,
+    file_name = 'Warehouse_info.csv',
+    mime = 'text/csv',
+)
 
 
 ####ShowDatabases
