@@ -148,7 +148,7 @@ with st.sidebar:
     )
     
 if sel_data != 'Select below available Databases':
-    if st.button('Create Database', on_click = callback) or st.session_state.key:
+    if st.button('Create a Database', on_click = callback) or st.session_state.key:
         
         create_data(con)
         #pass
