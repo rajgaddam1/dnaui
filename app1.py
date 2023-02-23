@@ -1,5 +1,6 @@
 https://github.com/ultralytics/yolov5.git
 export PYTHONPATH=$PYTHONPATH:/home/yourusername/yolov5  # Replace "yourusername" with your actual username
+set PYTHONPATH=%PYTHONPATH%;C:\path\to\yolov5
 
 
 import torch
