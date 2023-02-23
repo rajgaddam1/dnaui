@@ -1,182 +1,73 @@
-import streamlit as st
 import os
-import snowflake.connector
-import warnings
-warnings.filterwarnings("ignore")
-import pandas as pd
-from snowflake.connector.connection import SnowflakeConnection
+import cv2
+import numpy as np
+from PIL import Image
+import torch
+from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
+from tqdm import tqdm
 
+# Define the transform to apply to each image
+transform = transforms.Compose([
+    transforms.Resize((640, 640)), # Resize the image to (640, 640)
+    transforms.ToTensor() # Convert the image to a tensor
+])
 
-##To manage bug in sreamlit(Intialize button click)
-if 'key' not in st.session_state:
-    st.session_state.key = False
-
-def callback():
-    st.session_state.key = True
-    
-###Function to convert data to csv
-
-@st.cache
-def convert_df(df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    return df.to_csv().encode('utf-8')
-
-##############Snowflake Credentials
-user = os.environ.get('user')
-password = os.environ.get('password')
-account = os.environ.get('account')
-
-###Snow connection
-
-con = snowflake.connector.connect(
-                    user = user,
-                    password = password,
-                    account='MD93775.ap-southeast-1')
-
-####Snowflake connection
-def get_connector() -> SnowflakeConnection:
-    """Create a connector to SnowFlake using credentials filled in Streamlit secrets"""
-    con = snowflake.connector.connect(
-    user = user,
-    password = password,
-    account = account,
-    warehouse='DNAHACK')
-    return con
-
-snowflake_connector = get_connector()
-#####Show warehouses
-def get_wareshouse(_connector) -> pd.DataFrame:
-    return pd.read_sql("SHOW WAREHOUSES;", _connector)
-
-wareshouse = get_wareshouse(snowflake_connector)
-
-list_ware = wareshouse['name'].to_list()
-list_up = ['Select below available wareshouse']
-list_ware_up = list_up + list_ware
-
-##Snowflake Waarehouse dataframe to csv
-
-ware_csv = convert_df(wareshouse)
-
-#################Function to create Warehouse
-
-def create_ware(con):
-    ware_name = st.text_input('Enter Warehouse Name')
-    ware_size = st.select_slider('Select size', ['XSMALL', 'SMALL', 'MEDIUM', 'LARGE', 'XLARGE', 'XXLARGE', 'XXXLARGE', 'X4LARGE', 'X5LARGE', 'X6LARGE'])
-    sql_cmd = 'CREATE OR REPLACE WAREHOUSE  ' + str(ware_name) + ' ' +'WAREHOUSE_SIZE = '+ str(ware_size) +';'
-    if st.button('Create Warehouse'):
-        try:
-            cur = con.cursor()
-            cur.execute(sql_cmd)
-            st.write('Warehouse has been created')
-        except Exception as e:
-            print(e)
-            st.write('An error has occured please check logs')
-        finally:
-            cur.close()
-        con.close()
-#################Function to create Databsase
-def create_data(con):
-    database_name = st.text_input('Enter Database Name')
-    database_type = st.radio('Select Database Type', ['PERMANENT', 'TRANSIENT'])
-    if database_type == 'PERMANENT':
-        sql_cmd = 'CREATE OR REPLACE DATABASE  ' + str(database_name) + ';'
-    else:
-        sql_cmd = 'CREATE OR REPLACE TRANSIENT DATABASE  ' + str(database_name) + ';'
+# Define the YOLOv5 dataset class
+class YOLOv5Dataset(Dataset):
+    def __init__(self, img_dir, label_dir, transform=None):
+        self.img_dir = img_dir
+        self.label_dir = label_dir
+        self.transform = transform
         
-    if st.button('Create Database'):
-        try:
-            cur = con.cursor()
-            cur.execute(sql_cmd)
-            st.write('Database has been created')
-        except Exception as e:
-            print(e)
-            st.write('An error has occured please check logs')
-        finally:
-            cur.close()
-        con.close()
+        # Load the list of image and label files
+        self.img_files = os.listdir(img_dir)
+        self.label_files = os.listdir(label_dir)
         
+    def __len__(self):
+        return len(self.img_files)
     
-################SIDEBAR_1(WAREHOUSE)
-with st.sidebar:
-    sel_ware = st.radio(
-        "Warehouse",
-        list_ware_up
-    )
-
-if sel_ware != 'Select below available wareshouse':
-    if st.button('Create a new warehouse', on_click = callback) or st.session_state.key:
+    def __getitem__(self, idx):
+        # Load the image
+        img_path = os.path.join(self.img_dir, self.img_files[idx])
+        img = Image.open(img_path)
         
-        create_ware(con)
-        #pass
-    st.subheader('Warehouse Information')
-
-    st.dataframe(wareshouse[['name', 'size']].loc[wareshouse['name'] == sel_ware])
-    
-    st.markdown("Click on below button to Download full Information about Warehouse")
-    st.download_button(
-    label = "Download data as CSV",
-    data = ware_csv,
-    file_name = 'Warehouse_info.csv',
-    mime = 'text/csv',
-)
-
-
-####ShowDatabases
-def get_databases(_connector) -> pd.DataFrame:
-    return pd.read_sql("SHOW DATABASES;", _connector)
-
-databases = get_databases(snowflake_connector)
-
-##Snowflake Waarehouse dataframe to csv
-
-database_csv = convert_df(databases)
-
-##Adding Database type by creating copy of dataframe
-databases_up = databases.copy()
-databases_up.rename(columns={'options': 'type'}, inplace=True)
-#databases_up['type'] = databases_up['type'].replace(np.nan, 'PERMANENT')
-databases_up.type.fillna("PERMANENT",inplace = True)
-
-
-list_data = databases['name'].to_list()
-list_up = ['Select below available Databases']
-list_data_up = list_up + list_data
-#############SIDEBAR_2(DATABASES)
-with st.sidebar:
-    global sel_data
-    sel_data = st.radio("Databases", list_data_up)
-with st.sidebar:
-    global sel_schema
-    sel_schema = st.radio("Schema", 'None')
-    
-if sel_data != 'Select below available Databases':
-    if st.button('Create a Database', on_click = callback) or st.session_state.key:
+        # Load the labels
+        label_path = os.path.join(self.label_dir, self.label_files[idx])
+        with open(label_path, 'r') as f:
+            labels = f.readlines()
+        labels = [label.strip().split() for label in labels]
+        labels = np.array(labels, dtype=np.float32)
         
-        create_data(con)
-        #pass
-    st.subheader('Database Information')
+        # Apply the transform to the image
+        if self.transform:
+            img = self.transform(img)
+            
+        return img, labels
+    
+# Define a function to visualize the bounding boxes on the images
+def visualize(img, boxes):
+    img = np.array(img)
+    for box in boxes:
+        x1, y1, x2, y2 = box
+        img = cv2.rectangle(img, (int(x1), int(y1)), (int(x2), int(y2)), (0, 255, 0), 2)
+    return img
 
-    st.dataframe(databases_up[['name', 'type']].loc[databases_up['name'] == sel_data])
-    
-    st.markdown("Click on below button to Download full Information about Database")
-    st.download_button(
-    label = "Download data as CSV",
-    data = database_csv,
-    file_name = 'Database_info.csv',
-    mime = 'text/csv',
-)
-    
-#############SIDEBAR_3(Schemas)  
-def get_schema(_connector, dbname) -> pd.DataFrame:
-    sql_cmd2 = 'SHOW SCHEMAS IN DATABASE ' + str(dbname) + ';'
-    return pd.read_sql(sql_cmd2, _connector)
- 
-if sel_data != 'Select below available Databases':
-    
-    schemas_df = get_schema(snowflake_connector, sel_data)
-    sc_list_data = schemas_df['name'].to_list()
-    sc_list_up = ['Select below available Schemas']
-    sc_list_data_up = sc_list_up + sc_list_data
-    with st.sidebar:
-        sel_schema = st.radio("Schema",sc_list_data_up)
+# Define the paths to your image and label directories
+img_dir = 'path/to/your/image/directory'
+label_dir = 'path/to/your/label/directory'
+
+# Create the YOLOv5 dataset
+dataset = YOLOv5Dataset(img_dir, label_dir, transform=transform)
+
+# Create the dataloader to load the data in batches
+dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+
+# Loop over the data and visualize a few samples
+for batch in tqdm(dataloader):
+    imgs, labels = batch
+    for i in range(len(imgs)):
+        img = transforms.ToPILImage()(imgs[i])
+        boxes = labels[i][:, 1:] # Get the bounding boxes from the labels
+        img = visualize(img, boxes)
+        img.show()
