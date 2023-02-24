@@ -1,54 +1,22 @@
-https://github.com/ultralytics/yolov5.git
-export PYTHONPATH=$PYTHONPATH:/home/yourusername/yolov5  # Replace "yourusername" with your actual username
-set PYTHONPATH=%PYTHONPATH%;C:\path\to\yolov5
+import pandas as pd
 
+# create a sample DataFrame
+data = {'Name': ['Alice', 'Bob', 'Charlie', 'Dave'], 'Age': [25, 30, 35, 40]}
+df = pd.DataFrame(data)
 
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader
-from torchvision import transforms
-from yolov5.models.yolo import Model
-from yolov5.utils.datasets import LoadImagesAndLabels, collate_fn
+# create a Styler object by calling the style attribute on the DataFrame
+styler = df.style
 
-# Define the input and output directories
-img_dir = "path/to/preprocessed/images"
-label_dir = "path/to/preprocessed/annotations"
+# apply styling to the 'Age' column based on a condition
+styler = styler.applymap(lambda x: 'color: red' if x > 30 else '', subset=['Age'])
 
-# Define the batch size and number of workers for data loading
-batch_size = 8
-num_workers = 4
+# set the table styles to add borders
+table_styles = [{'selector': 'table', 'props': [('border-collapse', 'collapse')]},
+                {'selector': 'th, td', 'props': [('border', '1px solid black')]}]
+styler.set_table_styles(table_styles)
 
-# Define the transforms for data augmentation
-transforms = transforms.Compose([
-    transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.2),
-    transforms.RandomHorizontalFlip(p=0.5),
-    transforms.RandomVerticalFlip(p=0.5),
-    transforms.RandomRotation(degrees=10, resample=False, expand=False),
-    transforms.Resize((416, 416)),
-    transforms.ToTensor(),
-])
+# call the render method on the Styler object to get the HTML table
+html_table = styler.render(index=False)
 
-# Load the images and annotations into a dataset
-dataset = LoadImagesAndLabels(img_dir, label_dir, transform=transforms)
-
-# Define the data loader
-dataloader = DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, collate_fn=collate_fn)
-
-# Define the model
-model = Model(num_classes=1)
-
-# Define the optimizer and loss function
-optimizer = optim.Adam(model.parameters(), lr=0.001)
-loss_fn = nn.BCEWithLogitsLoss()
-
-# Train the model for 10 epochs
-num_epochs = 10
-for epoch in range(num_epochs):
-    for batch_idx, (images, targets, _) in enumerate(dataloader):
-        optimizer.zero_grad()
-        output = model(images)
-        loss = loss_fn(output, targets)
-        loss.backward()
-        optimizer.step()
-        print(f"Epoch {epoch+1}/{num_epochs}, Batch {batch_idx+1}/{len(dataloader)}, Loss: {loss.item():.4f}")
+# print the HTML table
+print(html_table)
