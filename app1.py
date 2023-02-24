@@ -12,7 +12,8 @@ styler = styler.applymap(lambda x: 'color: red' if x > 30 else '', subset=['Age'
 
 # set the table styles to add borders
 table_styles = [{'selector': 'table', 'props': [('border-collapse', 'collapse')]},
-                {'selector': 'th, td', 'props': [('border', '1px solid black')]}]
+                {'selector': 'th', 'props': [('border', '1px solid #ccc'), ('padding', '8px')]},
+                {'selector': 'td', 'props': [('border', '1px solid #ccc'), ('padding', '8px')]}]
 styler.set_table_styles(table_styles)
 
 # call the render method on the Styler object to get the HTML table
