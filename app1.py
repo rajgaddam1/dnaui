@@ -16,5 +16,5 @@ def contains_name(text):
 
 text = st.text_input('Enter Text',label_visibility="visible")
 if st.button("Sign In"):
-  a,b = contains_name(text):
+  a,b = contains_name(text)
     
