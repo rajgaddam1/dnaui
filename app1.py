@@ -15,6 +15,13 @@ def contains_name(text):
     return False
 
 text = st.text_input('Enter Text',label_visibility="visible")
-if st.button("Sign In"):
-  a,b = contains_name(text)
+if st.button("Submit"):
+    a,b = contains_name(text)
+    if b == False:
+        st.write('The text has no Names')
+    if b == True:
+        st.write('The text has Names')
+        st.write(a)
+        
+  
     
