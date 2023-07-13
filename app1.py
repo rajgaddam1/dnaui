@@ -1,18 +1,9 @@
 import streamlit as st
 import os
 import spacy
-import subprocess
 import warnings
 warnings.filterwarnings("ignore")
 st.header("Name Identification in text", anchor=None)
-
-@st.cache_resource
-def download_en_core_web_sm():
-    subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
-
-download_en_core_web_sm()
-
-
 
 def contains_name(text):
     nlp = spacy.load('en_core_web_sm')
