@@ -12,18 +12,17 @@ def contains_name(text):
     for ent in doc.ents:
         if ent.label_ == 'PERSON':
             names.append(ent.text)
-            return names, True
-        else:
-            return names, False
+    return names
 
 text = st.text_input('Enter Text',label_visibility="visible")
 if st.button("Submit"):
-    a,b = contains_name(text)
-    if b == False:
-        st.write('The text has no Names')
-    if b == True:
-        st.write('The text has Names')
-        st.write(a)
+    names_idn = contains_name(text)
+    if len(names_idn) == 0:
+        st.error('No names identified in the text')
+    else:
+        st.success('Below names identified in the text')
+        st.write(names_idn)
+
         
   
     
