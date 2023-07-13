@@ -13,7 +13,8 @@ def contains_name(text):
         if ent.label_ == 'PERSON':
             names.append(ent.text)
             return names, True
-    return False
+        else:
+            return names, False
 
 text = st.text_input('Enter Text',label_visibility="visible")
 if st.button("Submit"):
